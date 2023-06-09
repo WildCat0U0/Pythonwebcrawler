@@ -6,6 +6,7 @@ import requests
 from selenium import webdriver
 import time
 from bs4 import BeautifulSoup
+import csv
 
 mapping = {
     1 : "🟊",
@@ -14,6 +15,19 @@ mapping = {
     4 : "🟊🟊🟊🟊",
     5 : "🟊🟊🟊🟊🟊"
 }
+header = ['id','creation_Time',"star",'content','location','storage','color']
+
+with open("result_good3.csv","w",newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(header)
+
+with open("result_middle.csv","w",newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(header)
+
+with open("result_bad.csv","w",newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(header)
 
 for i in range(0, 70):
     url_good = "https://api.m.jd.com/?appid=item-v3&functionId=pc_club_productPageComments&client=pc&clientVersion=1.0.0" \
@@ -35,7 +49,9 @@ for i in range(0, 70):
         i["content"] = i["content"].replace("\n", ";")
         # strings = list(map(lambda x: mapping[x], i["score"]))
         strings = mapping.get(i["score"])
-        data = [str(i["id"]), str(i["creationTime"]), strings, str(i["content"])]
+        if "location" not in i.keys():
+            i["location"] = "这个人很懒，没有留下地址"
+        data = [str(i["id"]), str(i["creationTime"]), strings, str(i["content"]),str(i["location"])]
         data = pd.DataFrame(data).T
         data.to_csv('result_good.csv', mode='a', index=False, header=False, encoding='utf-8-sig')
 
@@ -48,7 +64,9 @@ for i in range(0, 70):
         i["content"] = i["content"].replace("\n", ";")
         # strings = list(map(lambda x: mapping[x], i["score"]))
         strings = mapping.get(i["score"])
-        data = [str(i["id"]), str(i["creationTime"]), strings, str(i["content"])]
+        if "location" not in i.keys():
+            i["location"] = "这个人很懒，没有留下地址"
+        data = [str(i["id"]), str(i["creationTime"]), strings, str(i["content"]),i["location"]]
         data = pd.DataFrame(data).T
         data.to_csv('result_middle.csv', mode='a', index=False, header=False, encoding='utf-8-sig')
 
@@ -61,7 +79,9 @@ for i in range(0, 70):
         i["content"] = i["content"].replace("\n", ";")
         # strings = list(map(lambda x: mapping[x], i["score"]))
         strings = mapping.get(i["score"])
-        data = [str(i["id"]), str(i["creationTime"]), strings, str(i["content"])]
+        if "location" not in i.keys():
+            i["location"] = "这个人很懒，没有留下地址"
+        data = [str(i["id"]), str(i["creationTime"]), strings, str(i["content"]),str(i["location"])]
         data = pd.DataFrame(data).T
         data.to_csv('result_bad.csv', mode='a', index=False, header=False, encoding='utf-8-sig')
 
